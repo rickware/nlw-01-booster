@@ -1,7 +1,7 @@
 {
   "name": "server",
   "version": "1.0.0",
-  "description": "",
+  "description": "server",
   "main": "index.js",
   "scripts": {
     "dev": "ts-node-dev --transpileOnly --ignore-watch node_modules src/server.ts",
@@ -9,8 +9,8 @@
     "knex:migrate": "knex --knexfile knexfile.ts migrate:latest"
   },
   "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "author": "rickware",
+  "license": "MIT",
   "dependencies": {
     "celebrate": "^12.1.1",
     "cors": "^2.8.5",
