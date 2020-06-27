@@ -9,6 +9,7 @@ import logo from '../../assets/logo.svg';
 const Home = () => {
   return (
     <div id="page-home">
+      <div id="bg"></div>
       <div className="content">
         <header>
           <img src={logo} alt="Ecoleta" />

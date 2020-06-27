@@ -35,11 +35,7 @@ const CreatePoint = () => {
 
   const [initialPosition, setInitialPosition] = useState<[number, number]>([0, 0]);
 
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    whatsapp: '',
-  });
+  const [formData, setFormData] = useState({ name: '', email: '', whatsapp: '' });
 
   const [selectedUf, setSelectedUf] = useState('0');
   const [selectedCity, setSelectedCity] = useState('0');
@@ -59,6 +55,7 @@ const CreatePoint = () => {
 
   useEffect(() => {
     api.get('items').then(response => {
+      console.log (response.data);
       setItems(response.data);
     });
   }, []);
@@ -72,28 +69,23 @@ const CreatePoint = () => {
   }, []);
 
   useEffect(() => {
-    if (selectedUf === '0') {
-      return;
-    }
+    if (selectedUf === '0') { return; }
 
     axios
       .get<IBGECityResponse[]>(`https://servicodados.ibge.gov.br/api/v1/localidades/estados/${selectedUf}/municipios`)
       .then(response => {
         const cityNames = response.data.map(city => city.nome);
-
         setCities(cityNames);
       });
   }, [selectedUf]);
 
   function handleSelectUf(event: ChangeEvent<HTMLSelectElement>) {
     const uf = event.target.value;
-
     setSelectedUf(uf);
   }
 
   function handleSelectCity(event: ChangeEvent<HTMLSelectElement>) {
     const city = event.target.value;
-
     setSelectedCity(city);
   }
 
