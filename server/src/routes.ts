@@ -17,8 +17,7 @@ routes.get('/items', itemsController.index);
 routes.get('/points', pointsController.index);
 routes.get('/points/:id', pointsController.show);
 
-routes.post(
-  '/points', 
+routes.post('/points', 
   upload.single('image'), 
   celebrate({
     body: Joi.object().keys({
@@ -31,10 +30,7 @@ routes.post(
       uf: Joi.string().required().max(2),
       items: Joi.string().required(),
     })
-  }, {
-    abortEarly: false
-  }),
-  pointsController.create
+  }, { abortEarly: false }), pointsController.create
 );
 
 export default routes;
