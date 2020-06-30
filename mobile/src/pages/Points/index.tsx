@@ -50,24 +50,17 @@ const Points = () => {
       }
 
       const location = await Location.getCurrentPositionAsync();
-
       const { latitude, longitude } = location.coords;
-
-      console.log(latitude, longitude);
-
-      setInitialPosition([
-        latitude,
-        longitude
-      ])
+      //console.log(latitude, longitude);
+      //setInitialPosition([ latitude, longitude ])
+      setInitialPosition([-22.4421861, -42.9816943]);
     }
 
     loadPosition();
   }, []);
 
   useEffect(() => {
-    api.get('items').then(response => {
-      setItems(response.data);
-    });
+    api.get('items').then(response => { setItems(response.data); });
   }, []);
 
   useEffect(() => {

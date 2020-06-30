@@ -32,11 +32,8 @@ const CreatePoint = () => {
   const [items, setItems] = useState<Item[]>([]);
   const [ufs, setUfs] = useState<string[]>([]);
   const [cities, setCities] = useState<string[]>([]);
-
   const [initialPosition, setInitialPosition] = useState<[number, number]>([0, 0]);
-
   const [formData, setFormData] = useState({ name: '', email: '', whatsapp: '' });
-
   const [selectedUf, setSelectedUf] = useState('0');
   const [selectedCity, setSelectedCity] = useState('0');
   const [selectedItems, setSelectedItems] = useState<number[]>([]);
@@ -44,26 +41,21 @@ const CreatePoint = () => {
   const [selectedFile, setSelectedFile] = useState<File>();
 
   const history = useHistory();
+    // useEffect(() => {qual funcao a executar}, [quando executar]) 
+    useEffect(() => {
+      api.get('items').then(response => { setItems(response.data); });
+    }, []);
 
-  useEffect(() => {
-    navigator.geolocation.getCurrentPosition(position => {
-      const { latitude, longitude } = position.coords;
-
-      setInitialPosition([latitude, longitude]);
-    });
-  }, []);
-
-  useEffect(() => {
-    api.get('items').then(response => {
-      //console.log (response.data);
-      setItems(response.data);
-    });
+    useEffect(() => {
+      navigator.geolocation.getCurrentPosition(position => {
+        const { latitude, longitude } = position.coords;
+        setInitialPosition([latitude, longitude]);
+      });
   }, []);
 
   useEffect(() => {
     axios.get<IBGEUFResponse[]>('https://servicodados.ibge.gov.br/api/v1/localidades/estados').then(response => {
       const ufInitials = response.data.map(uf => uf.sigla);
-
       setUfs(ufInitials);
     });
   }, []);
