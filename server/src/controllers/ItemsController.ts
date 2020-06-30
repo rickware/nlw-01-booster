@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import knex from '../database/connection';
-import getLocalIP = require('./getLocalIP.js');
+//import getLocalIP = require('./getLocalIP.js');
 
 class ItemsController {
   async index(request: Request, response: Response) {
