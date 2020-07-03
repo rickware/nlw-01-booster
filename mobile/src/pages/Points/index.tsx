@@ -42,20 +42,19 @@ const Points = () => {
 
   useEffect(() => {
     async function loadPosition() {
+      
       const { status } = await Location.requestPermissionsAsync();
-
       if (status !== 'granted') {
         Alert.alert('Oooops...', 'Precisamos de sua permissão para obter a localização');
         return;
       }
-
       const location = await Location.getCurrentPositionAsync();
       const { latitude, longitude } = location.coords;
-      //console.log(latitude, longitude);
-      //setInitialPosition([ latitude, longitude ])
-      setInitialPosition([-22.4421861, -42.9816943]);
+      console.log(latitude, longitude);
+      setInitialPosition([ latitude, longitude ])
+      
+      //setInitialPosition([-22.4421861, -42.9816943]);
     }
-
     loadPosition();
   }, []);
 
@@ -88,7 +87,6 @@ const Points = () => {
 
     if (alreadySelected >= 0) {
       const filteredItems = selectedItems.filter(item => item !== id);
-
       setSelectedItems(filteredItems);
     } else {
       setSelectedItems([ ...selectedItems, id ]);

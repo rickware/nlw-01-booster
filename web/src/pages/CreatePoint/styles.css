@@ -7,7 +7,7 @@
 
 #page-create-point header {
   margin-top: 48px;
-
+  padding: 0 30px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -200,4 +200,16 @@
 .items-grid li.selected {
   background: #E1FAEC;
   border: 2px solid #34CB79;
+}
+
+@media(max-width: 900px) {
+  #page-create-point form .field-group {
+    padding: 0px 120px;
+  }
+  #page-create-point form .field-group {
+    flex-direction: column;
+  }
+  #page-create-point form .field-group .field + .field {
+      margin-left: 0;
+  }
 }

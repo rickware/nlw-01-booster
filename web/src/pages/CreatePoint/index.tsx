@@ -8,6 +8,7 @@ import api from '../../services/api';
 import Dropzone from '../../components/Dropzone';
 import './styles.css';
 import logo from '../../assets/logo.svg';
+import NumberFormat from 'react-number-format';
 
 // array ou objeto:  informar o tipo da variavel
 interface Item {id: number; title: string; image_url: string;}
@@ -100,21 +101,30 @@ const CreatePoint = () => {
     const items = selectedItems;
     const data = new FormData();
 
-    if (selectedFile) { data.append('image', selectedFile) }
-    data.append('name', name);
-    data.append('email', email);
-    data.append('whatsapp', whatsapp);
-    data.append('uf', uf);
-    data.append('city', city);
-    data.append('latitude', String(latitude));
-    data.append('longitude', String(longitude));
-    data.append('items', items.join(','));
-
-    await api.post('points', data).catch(function (err) {alert(err.message);})
-
-    alert('Ponto de coleta criado!');
-
-    history.push('/');
+    
+    var flagCampos = true; var queCampo = '';
+    if (flagCampos && !selectedFile) {flagCampos = false; queCampo = 'Imagem';}
+    if (flagCampos && name.length < 3) {flagCampos = false; queCampo = 'Nome';}
+    if (flagCampos && email.length < 3) { flagCampos = false; queCampo = 'Email'; }
+    if (flagCampos && whatsapp.length < 10) { flagCampos = false; queCampo = '(DDD)Whatsapp'; }
+    if (flagCampos && String(latitude).length < 3) { flagCampos = false; queCampo = 'Posicao'; }
+    if (flagCampos && uf.length < 2) { flagCampos = false; queCampo = 'UF'; }
+    if (flagCampos && city.length < 2) { flagCampos = false; queCampo = 'Cidade'; }
+    if (flagCampos && items.length < 1) { flagCampos = false; queCampo = 'Items'; }
+    if (flagCampos) {
+      if (selectedFile) { data.append('image', selectedFile) }
+      data.append('name', name);
+      data.append('email', email);
+      data.append('whatsapp', whatsapp);
+      data.append('uf', uf);
+      data.append('city', city);
+      data.append('latitude', String(latitude));
+      data.append('longitude', String(longitude));
+      data.append('items', items.join(','));
+      await api.post('points', data).catch(function (err) { alert(err.message); })
+      alert('Ponto de coleta criado!');
+      history.push('/');
+    } else alert('Preencha o campo: ' + queCampo);
   }
 
   return (
@@ -148,7 +158,9 @@ const CreatePoint = () => {
             </div>
             <div className="field">
               <label htmlFor="whatsapp">Whatsapp</label>
-              <input type="text" name="whatsapp" id="whatsapp" onChange={handleInputChange}/>
+              {/* <input type="text" name="whatsapp" id="whatsapp" onChange={handleInputChange} /> */}
+              <NumberFormat name="whatsapp" id="whatsapp" format="+55 ### #########" mask="_" />
+
             </div>
           </div>
         </fieldset>
