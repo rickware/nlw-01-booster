@@ -42,7 +42,7 @@ const CreatePoint = () => {
 
   useEffect(() => {
     axios.get<IBGEUFResponse[]>('https://servicodados.ibge.gov.br/api/v1/localidades/estados').then(response => {
-      const ufInitials = response.data.map(uf => uf.sigla);
+      const ufInitials = response.data.map(uf => uf.sigla).sort();
       setUfs(ufInitials);
     });
   }, []);
@@ -100,7 +100,6 @@ const CreatePoint = () => {
     const [latitude, longitude] = selectedPosition;
     const items = selectedItems;
     const data = new FormData();
-
     
     var flagCampos = true; var queCampo = '';
     if (flagCampos && !selectedFile) {flagCampos = false; queCampo = 'Imagem';}
@@ -158,9 +157,7 @@ const CreatePoint = () => {
             </div>
             <div className="field">
               <label htmlFor="whatsapp">Whatsapp</label>
-              {/* <input type="text" name="whatsapp" id="whatsapp" onChange={handleInputChange} /> */}
-              <NumberFormat name="whatsapp" id="whatsapp" format="+55 ### #########" mask="_" />
-
+              <NumberFormat name="whatsapp" id="whatsapp" format="+55(##)#########" mask="_" onChange={handleInputChange}/>
             </div>
           </div>
         </fieldset>
