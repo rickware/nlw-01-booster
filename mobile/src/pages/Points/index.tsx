@@ -42,7 +42,6 @@ const Points = () => {
 
   useEffect(() => {
     async function loadPosition() {
-      
       const { status } = await Location.requestPermissionsAsync();
       if (status !== 'granted') {
         Alert.alert('Oooops...', 'Precisamos de sua permissão para obter a localização');
@@ -51,15 +50,14 @@ const Points = () => {
       const location = await Location.getCurrentPositionAsync();
       const { latitude, longitude } = location.coords;
       console.log(latitude, longitude);
-      setInitialPosition([ latitude, longitude ])
-      
-      //setInitialPosition([-22.4421861, -42.9816943]);
-    }
-    loadPosition();
+    //setInitialPosition([ latitude, longitude ])
+      setInitialPosition([-22.45406820766292, -42.9805326461792]);
+    } loadPosition();
   }, []);
 
   useEffect(() => {
     api.get('items').then(response => { setItems(response.data); });
+    console.log(items);
   }, []);
 
   useEffect(() => {
