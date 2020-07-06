@@ -2,7 +2,7 @@
 
 import { networkInterfaces } from 'os';
 var ifaces = networkInterfaces();
-var localIP = '';
+var serverIP = '';
 
 Object.keys(ifaces).forEach(function (ifname) {
     var alias = 0;
@@ -15,12 +15,13 @@ Object.keys(ifaces).forEach(function (ifname) {
         if (alias >= 1) {
             // this single interface has multiple ipv4 addresses
             console.log(ifname + ':' + alias, iface.address);
+            serverIP = iface.address;
         } else {
             // this interface has only one ipv4 adress
-            localIP = iface.address;
+            serverIP = iface.address;
         }
         ++alias;
     });
 });
 
-export default localIP;
+export default serverIP;

@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import knex from '../database/connection';
-import localIP from './getLocalIP';
+import serverIP from './getServerIP';
 
 class PointsController {
   
@@ -14,7 +14,7 @@ class PointsController {
       .where('uf', String(uf))
       .distinct()
       .select('points.*');
-    const serializedPoints = points.map(point => { return { ...point, image_url: `http://${localIP}:3333/uploads/${point.image}` };});
+    const serializedPoints = points.map(point => { return { ...point, image_url: `http://${serverIP}:3333/uploads/${point.image}` };});
     return response.json(serializedPoints);
   }
 
@@ -22,12 +22,12 @@ class PointsController {
     const { id } = request.params;
     const point = await knex('points').where('id', id).first();
     if (!point) { return response.status(400).json({ message: 'Point not found.' }); }
-    const serializedPoint = { ...point, image_url: `http://${localIP}:3333/uploads/${point.image}` };
+    const serializedPoint = { ...point, image_url: `http://${serverIP}:3333/uploads/${point.image}` };
     const items = await knex('items')
       .join('point_items', 'items.id', '=', 'point_items.item_id')
       .where('point_items.point_id', id)
       .select('items.title');
-    return response.json({ point: serializedPoint, items });
+    return response.json({ point: serializedPoint, items });v
   }
 
   async create(request: Request, response: Response) {

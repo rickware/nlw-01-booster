@@ -11,13 +11,22 @@
     "@types/react": "^16.9.0",
     "@types/react-dom": "^16.9.0",
     "axios": "^0.19.2",
+    "core-js": "^3.6.5",
+    "expo": "^38.0.8",
+    "expo-mail-composer": "^8.2.1",
     "leaflet": "^1.6.0",
+    "lodash": "^4.17.15",
     "polished": "^3.6.4",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-dropzone": "^11.0.1",
     "react-icons": "^3.10.0",
     "react-leaflet": "^2.7.0",
+    "react-native": "^0.62.2",
+    "react-native-gesture-handler": "^1.6.1",
+    "react-native-maps": "^0.27.1",
+    "react-native-svg": "^12.1.0",
+    "react-native-web": "^0.13.1",
     "react-number-format": "^4.4.1",
     "react-router-dom": "^5.2.0",
     "react-scripts": "3.4.1",
@@ -45,7 +54,9 @@
     ]
   },
   "devDependencies": {
+    "@react-navigation/native": "^5.6.1",
     "@types/react-leaflet": "^2.5.1",
+    "@types/react-native": "^0.62.16",
     "@types/react-router-dom": "^5.1.5"
   }
 }
