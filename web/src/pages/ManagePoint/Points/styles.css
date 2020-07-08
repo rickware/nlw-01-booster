@@ -1,7 +1,11 @@
+#id {visibility: hidden;}
+[name="fitems"] {visibility: hidden;}
+/*
+[name="uf"] { width: 76px; }
+*/
 #page-manage-point {
   width: 100%;
   max-width: 1100px;
-
   margin: 0 auto;
 }
 
@@ -158,6 +162,7 @@
   margin-top: 40px;
   transition: background-color 0.2s;
   cursor: pointer;
+  visibility: hidden;
 }
 
 #page-manage-point form button:hover {

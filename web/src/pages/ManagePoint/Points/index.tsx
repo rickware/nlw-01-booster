@@ -5,10 +5,8 @@ import { Map, TileLayer, Marker } from 'react-leaflet';
 import axios from 'axios';
 import { LeafletMouseEvent } from 'leaflet';
 import api from '../../../services/api';
-import Dropzone from '../../../components/Dropzone';
 import './styles.css';
 import logo from '../../../assets/logo.svg';
-import NumberFormat from 'react-number-format';
 
 // array ou objeto:  informar o tipo da variavel
 interface Item { id: number; title: string; image_url: string; }
@@ -20,12 +18,11 @@ const ManagePoints = () => {
   const [ufs, setUfs] = useState<string[]>([]);
   const [cities, setCities] = useState<string[]>([]);
   const [initialPosition, setInitialPosition] = useState<[number, number]>([0, 0]);
-  const [formData, setFormData] = useState({ name: '', email: '', whatsapp: '' });
+  //const [formData, setFormData] = useState({ name: '', email: '', whatsapp: '' });
   const [selectedUf, setSelectedUf] = useState('0');
   const [selectedCity, setSelectedCity] = useState('0');
   const [selectedItems, setSelectedItems] = useState<number[]>([]);
   const [selectedPosition, setSelectedPosition] = useState<[number, number]>([0, 0]);
-  const [selectedFile, setSelectedFile] = useState<File>();
   const history = useHistory();
 
   // useEffect(() => {qual funcao a executar}, [quando executar]) 
@@ -64,6 +61,12 @@ const ManagePoints = () => {
   }
 
   function handleSelectCity(event: ChangeEvent<HTMLSelectElement>) {
+    //  torna visivel os Items
+    let shand = document.getElementsByName('fitems') as NodeListOf<HTMLElement>;
+    if (shand.length !== 0) { shand[0].style.visibility = "visible" };
+    let sbutt = document.getElementById('btnSubmit') as HTMLElement;
+    sbutt.style.visibility = "visible";
+    
     const city = event.target.value;
     setSelectedCity(city);
   }
@@ -75,10 +78,10 @@ const ManagePoints = () => {
     ])
   }
 
-  function handleInputChange(event: ChangeEvent<HTMLInputElement>) {
+/*   function handleInputChange(event: ChangeEvent<HTMLInputElement>) {
     const { name, value } = event.target;
     setFormData({ ...formData, [name]: value });
-  }
+  } */
 
   function handleSelectItem(id: number) {
     const alreadySelected = selectedItems.findIndex(item => item === id);
@@ -94,7 +97,7 @@ const ManagePoints = () => {
   async function handleSubmit(event: FormEvent) {
     event.preventDefault();
 
-    const { name, email, whatsapp } = formData;
+    //const { name, email, whatsapp } = formData;
     const uf = selectedUf;
     const city = selectedCity;
     const [latitude, longitude] = selectedPosition;
@@ -102,27 +105,23 @@ const ManagePoints = () => {
     const data = new FormData();
 
     var flagCampos = true; var queCampo = '';
-    if (flagCampos && !selectedFile) { flagCampos = false; queCampo = 'Imagem'; }
-    if (flagCampos && name.length < 3) { flagCampos = false; queCampo = 'Nome'; }
-    if (flagCampos && email.length < 3) { flagCampos = false; queCampo = 'Email'; }
-    if (flagCampos && whatsapp.length < 10) { flagCampos = false; queCampo = '(DDD)Whatsapp'; }
     if (flagCampos && String(latitude).length < 3) { flagCampos = false; queCampo = 'Posicao'; }
     if (flagCampos && uf.length < 2) { flagCampos = false; queCampo = 'UF'; }
     if (flagCampos && city.length < 2) { flagCampos = false; queCampo = 'Cidade'; }
     if (flagCampos && items.length < 1) { flagCampos = false; queCampo = 'Items'; }
     if (flagCampos) {
-      if (selectedFile) { data.append('image', selectedFile) }
-      data.append('name', name);
-      data.append('email', email);
-      data.append('whatsapp', whatsapp);
+      //if (selectedFile) { data.append('image', selectedFile) }
       data.append('uf', uf);
       data.append('city', city);
       data.append('latitude', String(latitude));
       data.append('longitude', String(longitude));
       data.append('items', items.join(','));
+      /*
       await api.post('points', data).catch(function (err) { alert(err.message); })
       alert('Ponto de coleta criado!');
-      history.push('/');
+      */
+     history.push('/');
+     
     } else alert('Preencha o campo: ' + queCampo);
   }
 
@@ -138,49 +137,19 @@ const ManagePoints = () => {
       </header>
 
       <form onSubmit={handleSubmit}>
-        <h1>Cadastro do <br /> ponto de coleta</h1>
-
-        <Dropzone onFileUploaded={setSelectedFile} />
-
-        <fieldset>
-          <legend> <h2>Dados</h2> </legend>
-
-          <div className="field">
-            <label htmlFor="name">Nome da entidade</label>
-            <input type="text" name="name" id="name" onChange={handleInputChange} />
-          </div>
-
-          <div className="field-group">
-            <div className="field">
-              <label htmlFor="email">E-mail</label>
-              <input type="email" name="email" id="email" onChange={handleInputChange} />
-            </div>
-            <div className="field">
-              <label htmlFor="whatsapp">Whatsapp</label>
-              <NumberFormat name="whatsapp" id="whatsapp" format="+55(##)#########" mask="_" onChange={handleInputChange} />
-            </div>
-          </div>
-        </fieldset>
+        <h1>Pontos de coleta</h1>
 
         <fieldset>
           <legend>
             <h2>Endereço</h2>
-            <span>Selecione o endereço no mapa</span>
+            <span>Selecione um endereço no mapa</span>
           </legend>
-
-          <Map center={initialPosition} zoom={15} onClick={handleMapClick}>
-            <TileLayer
-              attribution='&amp;copy <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            />
-            <Marker position={selectedPosition} />
-          </Map>
 
           <div className="field-group">
             <div className="field">
               <label htmlFor="uf">Estado (UF)</label>
               <select name="uf" id="uf" value={selectedUf} onChange={handleSelectUf}>
-                <option value="0">Selecione uma UF</option>
+                <option value="0">UF</option>
                 {ufs.map(uf => (<option key={uf} value={uf}>{uf}</option>))}
               </select>
             </div>
@@ -192,9 +161,17 @@ const ManagePoints = () => {
               </select>
             </div>
           </div>
+
+          <Map center={initialPosition} zoom={15} onClick={handleMapClick}>
+            <TileLayer
+              attribution='&amp;copy <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            />
+            <Marker position={selectedPosition} />
+          </Map>
         </fieldset>
 
-        <fieldset>
+        <fieldset name="fitems">
           <legend>
             <h2>Ítens de coleta</h2>
             <span>Selecione um ou mais ítens abaixo</span>
@@ -214,7 +191,7 @@ const ManagePoints = () => {
           </ul>
         </fieldset>
 
-        <button type="submit">Cadastrar ponto de coleta</button>
+        <button id="btnSubmit" type="submit">Cadastrar ponto de coleta</button>
       </form>
     </div>
   );
