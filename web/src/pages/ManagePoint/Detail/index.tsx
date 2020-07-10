@@ -1,19 +1,38 @@
 import React, { useEffect, useState, ChangeEvent, FormEvent } from 'react';
-import { Link, useHistory } from 'react-router-dom';
+import { Link, useHistory, /*Router, Route*/ } from 'react-router-dom';
 import { FiArrowLeft } from 'react-icons/fi';
 import { Map, TileLayer, Marker } from 'react-leaflet';
+import NumberFormat from 'react-number-format';
 import axios from 'axios';
 import { LeafletMouseEvent } from 'leaflet';
 import api from '../../../services/api';
 import Dropzone from '../../../components/Dropzone';
-import './styles.css';
 import logo from '../../../assets/logo.svg';
-import NumberFormat from 'react-number-format';
+import './styles.css';
+//import Routes from '../../../routes';
 
 // array ou objeto:  informar o tipo da variavel
 interface Item { id: number; title: string; image_url: string; }
 interface IBGEUFResponse { sigla: string; }
 interface IBGECityResponse { nome: string; }
+interface Params {point_id: number;}
+interface Dados {
+  point: {
+    image: string;
+    image_url: string;
+    name: string;
+    email: string;
+    whatsapp: string;
+    city: string;
+    uf: string;
+    latitude: number;
+    longitude: number;
+  };
+  items: {
+    id: number;
+    title: string;
+  }[];
+}
 
 const ManageDetail = () => {
   const [items, setItems] = useState<Item[]>([]);
@@ -27,31 +46,41 @@ const ManageDetail = () => {
   const [selectedPosition, setSelectedPosition] = useState<[number, number]>([0, 0]);
   const [selectedFile, setSelectedFile] = useState<File>();
   const history = useHistory();
+  const [dados, setDados] = useState<Dados>({} as Dados);
+  const [newfile, setNewfile] = useState<Boolean>(false);
+  
+  //const navigation = useNavigation();
+  //const route = useRoute();
+  //const routeParams = Router.caller.arguments as Params;
+  //const { match: { params } } = this.props;
 
   // useEffect(() => {qual funcao a executar}, [quando executar]) 
-  useEffect(() => {
+  useEffect(() => {   // Points
+    //api.get(`points/${params.point_id}`).then(response => {
+    api.get(`points/3`).then(response => { setDados(response.data); });
+  }, []);
+
+  useEffect(() => {   // Items (originais)
     api.get('items').then(response => { setItems(response.data); });
   }, []);
 
-  useEffect(() => {
+  useEffect(() => {   // GeoLocation
     navigator.geolocation.getCurrentPosition(position => {
       const { latitude, longitude } = position.coords;
       setInitialPosition([latitude, longitude]);
     });
   }, []);
 
-  useEffect(() => {
+  useEffect(() => {   // UF
     axios.get<IBGEUFResponse[]>('https://servicodados.ibge.gov.br/api/v1/localidades/estados').then(response => {
       const ufInitials = response.data.map(uf => uf.sigla).sort();
       setUfs(ufInitials);
     });
   }, []);
 
-  useEffect(() => {
+  useEffect(() => {   // City
     if (selectedUf === '0') { return; }
-
-    axios
-      .get<IBGECityResponse[]>(`https://servicodados.ibge.gov.br/api/v1/localidades/estados/${selectedUf}/municipios`)
+    axios.get<IBGECityResponse[]>(`https://servicodados.ibge.gov.br/api/v1/localidades/estados/${selectedUf}/municipios`)
       .then(response => {
         const cityNames = response.data.map(city => city.nome);
         setCities(cityNames);
@@ -82,7 +111,6 @@ const ManageDetail = () => {
 
   function handleSelectItem(id: number) {
     const alreadySelected = selectedItems.findIndex(item => item === id);
-
     if (alreadySelected >= 0) {
       const filteredItems = selectedItems.filter(item => item !== id);
       setSelectedItems(filteredItems);
@@ -91,15 +119,18 @@ const ManageDetail = () => {
     }
   }
 
+  function handleImgDblClick() {
+    setNewfile(true);
+  }
+
   async function handleSubmit(event: FormEvent) {
     event.preventDefault();
-
     const { name, email, whatsapp } = formData;
     const uf = selectedUf;
     const city = selectedCity;
     const [latitude, longitude] = selectedPosition;
     const items = selectedItems;
-    const data = new FormData();
+    const fdata = new FormData();
 
     var flagCampos = true; var queCampo = '';
     if (flagCampos && !selectedFile) { flagCampos = false; queCampo = 'Imagem'; }
@@ -111,23 +142,37 @@ const ManageDetail = () => {
     if (flagCampos && city.length < 2) { flagCampos = false; queCampo = 'Cidade'; }
     if (flagCampos && items.length < 1) { flagCampos = false; queCampo = 'Items'; }
     if (flagCampos) {
-      if (selectedFile) { data.append('image', selectedFile) }
-      data.append('name', name);
-      data.append('email', email);
-      data.append('whatsapp', whatsapp);
-      data.append('uf', uf);
-      data.append('city', city);
-      data.append('latitude', String(latitude));
-      data.append('longitude', String(longitude));
-      data.append('items', items.join(','));
-      await api.post('points', data).catch(function (err) { alert(err.message); })
+      if (selectedFile) { fdata.append('image', selectedFile) }
+      fdata.append('name', name);
+      fdata.append('email', email);
+      fdata.append('whatsapp', whatsapp);
+      fdata.append('uf', uf);
+      fdata.append('city', city);
+      fdata.append('latitude', String(latitude));
+      fdata.append('longitude', String(longitude));
+      fdata.append('items', items.join(','));
+      await api.post('points', fdata).catch(function (err) { alert(err.message); })
       alert('Ponto de coleta criado!');
       history.push('/');
     } else alert('Preencha o campo: ' + queCampo);
   }
 
+  if (!dados.point) { return null; }
+  if (selectedPosition[0] === 0) { setSelectedPosition([dados.point.latitude, dados.point.longitude]) };
+  if (selectedUf === '0') { setSelectedUf(dados.point.uf) };
+  if (selectedCity === '0') { setSelectedCity(dados.point.city) };
+  
+  if (selectedItems.length === 0) {
+    var i: any;
+    var dadositems: number[] = new Array(dados.items.length);
+    for (i in dados.items) {
+      dadositems[i] = dados.items[i].id;
+    }
+    setSelectedItems(dadositems);
+  }
+
   return (
-    <div id="page-create-detail">
+    <div id="page-manage-detail">
       <header>
         <img src={logo} alt="Ecoleta" />
 
@@ -138,26 +183,32 @@ const ManageDetail = () => {
       </header>
 
       <form onSubmit={handleSubmit}>
-        <h1>Cadastro do <br /> ponto de coleta</h1>
+        <h1>Detalhes do <br /> ponto de coleta</h1>
 
+        <div className={newfile ? 'setHidden' : 'setVisible'}>
+          <img className="imagem" src={dados.point.image_url} alt={dados.point.name} onDoubleClick={handleImgDblClick} title="De duplo-clique para alterar" />
+        </div>
+
+        <div className={newfile ? 'setVisible' : 'setHidden'}>
         <Dropzone onFileUploaded={setSelectedFile} />
+        </div>
 
         <fieldset>
           <legend> <h2>Dados</h2> </legend>
 
           <div className="field">
             <label htmlFor="name">Nome da entidade</label>
-            <input type="text" name="name" id="name" onChange={handleInputChange} />
+            <input type="text" name="name" id="name" onChange={handleInputChange} value={dados.point.name} />
           </div>
 
           <div className="field-group">
             <div className="field">
               <label htmlFor="email">E-mail</label>
-              <input type="email" name="email" id="email" onChange={handleInputChange} />
+              <input type="email" name="email" id="email" onChange={handleInputChange} value={dados.point.email} />
             </div>
             <div className="field">
               <label htmlFor="whatsapp">Whatsapp</label>
-              <NumberFormat name="whatsapp" id="whatsapp" format="+55(##)#########" mask="_" onChange={handleInputChange} />
+              <NumberFormat name="whatsapp" id="whatsapp" format="+55(##)#########" mask="_" onChange={handleInputChange} value={dados.point.whatsapp} />
             </div>
           </div>
         </fieldset>
@@ -181,14 +232,14 @@ const ManageDetail = () => {
               <label htmlFor="uf">Estado (UF)</label>
               <select name="uf" id="uf" value={selectedUf} onChange={handleSelectUf}>
                 <option value="0">Selecione uma UF</option>
-                {ufs.map(uf => (<option key={uf} value={uf}>{uf}</option>))}
+                {ufs.map(uf => ( <option key={uf} value={uf}> {uf} </option> ))}
               </select>
             </div>
             <div className="field">
               <label htmlFor="city">Cidade</label>
               <select name="city" id="city" value={selectedCity} onChange={handleSelectCity}>
                 <option value="0">Selecione uma cidade</option>
-                {cities.map(city => (<option key={city} value={city}>{city}</option>))}
+                {cities.map(city => ( <option key={city} value={city}> {city} </option> ))}
               </select>
             </div>
           </div>
@@ -213,8 +264,7 @@ const ManageDetail = () => {
             ))}
           </ul>
         </fieldset>
-
-        <button type="submit">Cadastrar ponto de coleta</button>
+        <button type="submit">Alterar ponto de coleta</button>
       </form>
     </div>
   );

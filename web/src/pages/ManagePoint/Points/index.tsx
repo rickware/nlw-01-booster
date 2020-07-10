@@ -1,19 +1,38 @@
 import React, { useEffect, useState, ChangeEvent, FormEvent } from 'react';
-import { Link, useHistory } from 'react-router-dom';
-import { FiArrowLeft } from 'react-icons/fi';
+import { Link, useHistory, /*Router, Route*/ } from 'react-router-dom';
+//import { Redirect } from 'react-router';
+import { FiArrowLeft, FiArrowRightCircle } from 'react-icons/fi';
 import { Map, TileLayer, Marker } from 'react-leaflet';
 import axios from 'axios';
 import { LeafletMouseEvent } from 'leaflet';
 import api from '../../../services/api';
 import './styles.css';
 import logo from '../../../assets/logo.svg';
+//import Routes from '../../../routes';
 
 // array ou objeto:  informar o tipo da variavel
 interface Item { id: number; title: string; image_url: string; }
 interface IBGEUFResponse { sigla: string; }
 interface IBGECityResponse { nome: string; }
+interface Point {
+  id: number;
+  name: string;
+  image: string;
+  image_url: string;
+  latitude: number;
+  longitude: number;
+}
+interface Params {
+  uf: string;
+  city: string;
+}
+var searchParams = new URLSearchParams();
+searchParams.append('uf', 'RJ');
+searchParams.append('city', 'Campos');
+const routeParams = searchParams;
 
 const ManagePoints = () => {
+  const [points, setPoints] = useState<Point[]>([]);
   const [items, setItems] = useState<Item[]>([]);
   const [ufs, setUfs] = useState<string[]>([]);
   const [cities, setCities] = useState<string[]>([]);
@@ -24,6 +43,18 @@ const ManagePoints = () => {
   const [selectedItems, setSelectedItems] = useState<number[]>([]);
   const [selectedPosition, setSelectedPosition] = useState<[number, number]>([0, 0]);
   const history = useHistory();
+
+  useEffect(() => {
+    api.get('points', {
+      params: {
+        city: routeParams.get('city'),
+        uf: routeParams.get('uf'),
+        items: selectedItems
+      }
+    }).then(response => {
+      setPoints(response.data);
+    })
+  }, [selectedItems]); 
 
   // useEffect(() => {qual funcao a executar}, [quando executar]) 
   useEffect(() => {
@@ -76,6 +107,10 @@ const ManagePoints = () => {
       event.latlng.lat,
       event.latlng.lng,
     ])
+  }
+
+  function handleNavigateToDetail(id: number) {
+   // navigation.navigate('Detail', { point_id: id });
   }
 
 /*   function handleInputChange(event: ChangeEvent<HTMLInputElement>) {
@@ -150,7 +185,7 @@ const ManagePoints = () => {
               <label htmlFor="uf">Estado (UF)</label>
               <select name="uf" id="uf" value={selectedUf} onChange={handleSelectUf}>
                 <option value="0">UF</option>
-                {ufs.map(uf => (<option key={uf} value={uf}>{uf}</option>))}
+                {ufs.map(uf => (<option key={uf}value={uf}>{uf}</option>))}
               </select>
             </div>
             <div className="field">
@@ -167,7 +202,16 @@ const ManagePoints = () => {
               attribution='&amp;copy <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             />
-            <Marker position={selectedPosition} />
+            {points.map(point => (
+              <Marker
+                key={String(point.id)}
+                onclick={() => handleNavigateToDetail(point.id)}
+                position={{
+                  lat: point.latitude,
+                  lng: point.longitude
+                }}
+              />
+            ))}
           </Map>
         </fieldset>
 
@@ -190,8 +234,11 @@ const ManagePoints = () => {
             ))}
           </ul>
         </fieldset>
-
-        <button id="btnSubmit" type="submit">Cadastrar ponto de coleta</button>
+        <Link to="/webDetail">
+          <FiArrowRightCircle />
+          Ver Detalhe
+        </Link>   
+        <button id="btnSubmit" type="submit">Ver ponto de coleta</button>
       </form>
     </div>
   );

@@ -209,7 +209,7 @@
 
 @media(max-width: 900px) {
   #page-manage-point form .field-group {
-    padding: 0px 120px;
+    padding: 0px 12px;
   }
   #page-manage-point form .field-group {
     flex-direction: column;
