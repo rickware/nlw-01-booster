@@ -18,6 +18,7 @@ interface IBGECityResponse { nome: string; }
 interface Params {point_id: number;}
 interface Dados {
   point: {
+    id: number;
     image: string;
     image_url: string;
     name: string;
@@ -39,7 +40,7 @@ const ManageDetail = () => {
   const [ufs, setUfs] = useState<string[]>([]);
   const [cities, setCities] = useState<string[]>([]);
   const [initialPosition, setInitialPosition] = useState<[number, number]>([0, 0]);
-  const [formData, setFormData] = useState({ name: '', email: '', whatsapp: '' });
+  const [formPerson, setFormPerson] = useState({ name: '', email: '', whatsapp: '' });
   const [selectedUf, setSelectedUf] = useState('0');
   const [selectedCity, setSelectedCity] = useState('0');
   const [selectedItems, setSelectedItems] = useState<number[]>([]);
@@ -106,7 +107,7 @@ const ManageDetail = () => {
 
   function handleInputChange(event: ChangeEvent<HTMLInputElement>) {
     const { name, value } = event.target;
-    setFormData({ ...formData, [name]: value });
+    setFormPerson({ ...formPerson, [name]: value });
   }
 
   function handleSelectItem(id: number) {
@@ -118,22 +119,22 @@ const ManageDetail = () => {
       setSelectedItems([...selectedItems, id]);
     }
   }
-
+  
   function handleImgDblClick() {
     setNewfile(true);
   }
-
+  
   async function handleSubmit(event: FormEvent) {
     event.preventDefault();
-    const { name, email, whatsapp } = formData;
+    const { name, email, whatsapp } = formPerson;
     const uf = selectedUf;
     const city = selectedCity;
     const [latitude, longitude] = selectedPosition;
     const items = selectedItems;
     const fdata = new FormData();
-
+    
     var flagCampos = true; var queCampo = '';
-    if (flagCampos && !selectedFile) { flagCampos = false; queCampo = 'Imagem'; }
+    //if (flagCampos && !selectedFile) { flagCampos = false; queCampo = 'Imagem'; }
     if (flagCampos && name.length < 3) { flagCampos = false; queCampo = 'Nome'; }
     if (flagCampos && email.length < 3) { flagCampos = false; queCampo = 'Email'; }
     if (flagCampos && whatsapp.length < 10) { flagCampos = false; queCampo = '(DDD)Whatsapp'; }
@@ -141,23 +142,30 @@ const ManageDetail = () => {
     if (flagCampos && uf.length < 2) { flagCampos = false; queCampo = 'UF'; }
     if (flagCampos && city.length < 2) { flagCampos = false; queCampo = 'Cidade'; }
     if (flagCampos && items.length < 1) { flagCampos = false; queCampo = 'Items'; }
-    if (flagCampos) {
-      if (selectedFile) { fdata.append('image', selectedFile) }
-      fdata.append('name', name);
-      fdata.append('email', email);
-      fdata.append('whatsapp', whatsapp);
-      fdata.append('uf', uf);
-      fdata.append('city', city);
-      fdata.append('latitude', String(latitude));
-      fdata.append('longitude', String(longitude));
-      fdata.append('items', items.join(','));
-      await api.post('points', fdata).catch(function (err) { alert(err.message); })
-      alert('Ponto de coleta criado!');
-      history.push('/');
-    } else alert('Preencha o campo: ' + queCampo);
+    if (!flagCampos) {
+      alert('Preencha o campo: ' + queCampo);
+      return (false);
+    }
+    fdata.append('id', String(dados.point.id));
+    fdata.append('image', dados.point.image);
+    if (selectedFile) {fdata.set('image', selectedFile);}
+    fdata.append('imageToDelete', dados.point.image);
+    fdata.append('image', dados.point.image);
+    fdata.append('name', name);
+    fdata.append('email', email);
+    fdata.append('whatsapp', whatsapp);
+    fdata.append('uf', uf);
+    fdata.append('city', city);
+    fdata.append('latitude', String(latitude));
+    fdata.append('longitude', String(longitude));
+    fdata.append('items', items.join(','));
+    await api.post('points', fdata).catch(function (err) { alert(err.message); })
+    alert('Ponto de coleta alterado!');
+    history.goBack();
   }
 
   if (!dados.point) { return null; }
+  if (formPerson.name.length === 0) { setFormPerson({ name: dados.point.name, email: dados.point.email, whatsapp: dados.point.whatsapp }) }
   if (selectedPosition[0] === 0) { setSelectedPosition([dados.point.latitude, dados.point.longitude]) };
   if (selectedUf === '0') { setSelectedUf(dados.point.uf) };
   if (selectedCity === '0') { setSelectedCity(dados.point.city) };
@@ -165,12 +173,10 @@ const ManageDetail = () => {
   if (selectedItems.length === 0) {
     var i: any;
     var dadositems: number[] = new Array(dados.items.length);
-    for (i in dados.items) {
-      dadositems[i] = dados.items[i].id;
-    }
+    for (i in dados.items) { dadositems[i] = dados.items[i].id; }
     setSelectedItems(dadositems);
   }
-
+  
   return (
     <div id="page-manage-detail">
       <header>
@@ -198,17 +204,17 @@ const ManageDetail = () => {
 
           <div className="field">
             <label htmlFor="name">Nome da entidade</label>
-            <input type="text" name="name" id="name" onChange={handleInputChange} value={dados.point.name} />
+            <input type="text" name="name" id="name" onChange={handleInputChange} defaultValue={dados.point.name} />
           </div>
 
           <div className="field-group">
             <div className="field">
               <label htmlFor="email">E-mail</label>
-              <input type="email" name="email" id="email" onChange={handleInputChange} value={dados.point.email} />
+              <input type="email" name="email" id="email" onChange={handleInputChange} defaultValue={dados.point.email} />
             </div>
             <div className="field">
               <label htmlFor="whatsapp">Whatsapp</label>
-              <NumberFormat name="whatsapp" id="whatsapp" format="+55(##)#########" mask="_" onChange={handleInputChange} value={dados.point.whatsapp} />
+              <NumberFormat name="whatsapp" id="whatsapp" format="+55(##)#########" mask="_" onChange={handleInputChange} defaultValue={dados.point.whatsapp} />
             </div>
           </div>
         </fieldset>
