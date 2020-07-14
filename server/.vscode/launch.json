@@ -9,19 +9,11 @@
       "command": "npm run dev",
       "name": "Launch Server",
       "request": "launch",
-      "type": "node-terminal"
+      "type": "node-terminal",
+
+      "serverReadyAction":{
+        "action": "openExternally"
+      }
     },
-    {
-      "type": "node",
-      "request": "launch",
-      "name": "Launch Program",
-      "skipFiles": [
-        "<node_internals>/**"
-      ],
-      "program": "${workspaceFolder}\\server.ts",
-      "outFiles": [
-        "${workspaceFolder}/**/*.ts"
-      ]
-    }
   ]
 }

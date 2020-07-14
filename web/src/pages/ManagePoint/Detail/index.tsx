@@ -146,11 +146,10 @@ const ManageDetail = () => {
       alert('Preencha o campo: ' + queCampo);
       return (false);
     }
-    fdata.append('id', String(dados.point.id));
+    //fdata.append('id', String(dados.point.id));
     fdata.append('image', dados.point.image);
     if (selectedFile) {fdata.set('image', selectedFile);}
     fdata.append('imageToDelete', dados.point.image);
-    fdata.append('image', dados.point.image);
     fdata.append('name', name);
     fdata.append('email', email);
     fdata.append('whatsapp', whatsapp);
@@ -159,9 +158,12 @@ const ManageDetail = () => {
     fdata.append('latitude', String(latitude));
     fdata.append('longitude', String(longitude));
     fdata.append('items', items.join(','));
-    await api.post('points', fdata).catch(function (err) { alert(err.message); })
-    alert('Ponto de coleta alterado!');
-    history.goBack();
+    await api.post(`points/${dados.point.id}`, fdata)
+      .then(function (res) {
+        alert('Ponto de coleta alterado!');
+        history.goBack();
+      })
+      .catch(function (err) { alert(err.message) });
   }
 
   if (!dados.point) { return null; }
