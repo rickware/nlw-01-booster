@@ -9,7 +9,7 @@
     "knex:migrate": "knex --knexfile knexfile.ts migrate:latest"
   },
   "keywords": [],
-  "author": "rickware",
+  "author": "NLW",
   "license": "MIT",
   "dependencies": {
     "celebrate": "^12.1.1",

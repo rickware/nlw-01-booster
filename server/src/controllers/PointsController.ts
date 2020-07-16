@@ -32,6 +32,18 @@ class PointsController {
     return response.json({ point: serializedPoint, items });
   }
 
+  async remove(request: Request, response: Response) {
+    const trx = await knex.transaction();
+    const { id } = request.params;
+    await trx('points')
+      .where('id', id)
+      .del()
+      .catch(function (err) {
+        return response.status(400).json({ message: err.message });
+      });
+    return response.json({ message: 'Point erased' });
+  }
+
   async create(request: Request, response: Response) {
     const { name, email, whatsapp, latitude, longitude, city, uf, items } = request.body;
     const trx = await knex.transaction();
@@ -43,27 +55,40 @@ class PointsController {
     await trx.commit();
     return response.json({ id: point_id, ...point });
   }  
-
+  
   async update(request: Request, response: Response) {
     const trx = await knex.transaction();
-    //const { id } = request.params;
-    console.log(request.params);
-    //await trx('points').where('id', id).del().catch(function (err) { alert(err.message) });
-    // deletaar para ativar o efeito cascata na tabela point_itens
-    if (request.file.filename.length > 0) {
+    const { id } = request.params;
+
+    // remove old record to clean databases points & point_ids.
+    trx('points')
+      .where('id', id)
+      .del()
+      .catch(function (err) {
+        return response.status(400).json({ message: err.message });
+      });
+    trx('point_items')
+      .where('point_id', id)
+      .del()
+      .catch(function (err) {
+        return response.status(400).json({ message: err.message });
+      });
+     
+    if (request.file) {
       //todo #5
-      const { imageToDelete, name, email, whatsapp, latitude, longitude, city, uf, items } = request.body;
+      const { imageOriginal, name, email, whatsapp, latitude, longitude, city, uf, items } = request.body;
       const point = { image: request.file.filename, name, email, whatsapp, latitude, longitude, city, uf };
       const insertedIds = await trx('points').insert(point);
       const point_id = insertedIds[0];
       const pointItems = items.split(',').map((item: string) => Number(item.trim())).map((item_id: number) => { return { item_id, point_id }; })
       await trx('point_items').insert(pointItems);
       await trx.commit();
-      console.log(imageToDelete);
-      //fs.unlink(imageToDelete, (err) => {        if (err) throw err;      });
+      console.log(imageOriginal);
+      fs.unlink(`../../uploads/${imageOriginal}`, (err) => {        if (err) throw err;      });
       return response.json({ id: point_id, ...point });
     } else {
-      const { image, name, email, whatsapp, latitude, longitude, city, uf, items } = request.body;
+      const { imageOriginal, name, email, whatsapp, latitude, longitude, city, uf, items } = request.body;
+      const image = imageOriginal;
       const point = { image, name, email, whatsapp, latitude, longitude, city, uf };
       const insertedIds = await trx('points').insert(point);
       const point_id = insertedIds[0];

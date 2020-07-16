@@ -1,5 +1,5 @@
 import React, { useEffect, useState, ChangeEvent, FormEvent } from 'react';
-import { Link, useHistory, /*Router, Route*/ } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 import { FiArrowLeft } from 'react-icons/fi';
 import { Map, TileLayer, Marker } from 'react-leaflet';
 import NumberFormat from 'react-number-format';
@@ -36,6 +36,8 @@ interface Dados {
 }
 
 const ManageDetail = () => {
+  var searchParams = new URLSearchParams();
+  let   id = searchParams.get('point_id');
   const [items, setItems] = useState<Item[]>([]);
   const [ufs, setUfs] = useState<string[]>([]);
   const [cities, setCities] = useState<string[]>([]);
@@ -49,17 +51,11 @@ const ManageDetail = () => {
   const history = useHistory();
   const [dados, setDados] = useState<Dados>({} as Dados);
   const [newfile, setNewfile] = useState<Boolean>(false);
-  
-  //const navigation = useNavigation();
-  //const route = useRoute();
-  //const routeParams = Router.caller.arguments as Params;
-  //const { match: { params } } = this.props;
 
   // useEffect(() => {qual funcao a executar}, [quando executar]) 
   useEffect(() => {   // Points
-    //api.get(`points/${params.point_id}`).then(response => {
-    api.get(`points/3`).then(response => { setDados(response.data); });
-  }, []);
+    api.get(`points/${id}`).then(response => { setDados(response.data); });
+  }, [id]);
 
   useEffect(() => {   // Items (originais)
     api.get('items').then(response => { setItems(response.data); });
@@ -142,14 +138,10 @@ const ManageDetail = () => {
     if (flagCampos && uf.length < 2) { flagCampos = false; queCampo = 'UF'; }
     if (flagCampos && city.length < 2) { flagCampos = false; queCampo = 'Cidade'; }
     if (flagCampos && items.length < 1) { flagCampos = false; queCampo = 'Items'; }
-    if (!flagCampos) {
-      alert('Preencha o campo: ' + queCampo);
-      return (false);
-    }
-    //fdata.append('id', String(dados.point.id));
-    fdata.append('image', dados.point.image);
-    if (selectedFile) {fdata.set('image', selectedFile);}
-    fdata.append('imageToDelete', dados.point.image);
+    if (!flagCampos) { alert('Preencha o campo: ' + queCampo); return (false); }
+   
+    if (selectedFile) {fdata.append('image', selectedFile);} 
+    fdata.append('imageOriginal', dados.point.image);
     fdata.append('name', name);
     fdata.append('email', email);
     fdata.append('whatsapp', whatsapp);
@@ -159,7 +151,7 @@ const ManageDetail = () => {
     fdata.append('longitude', String(longitude));
     fdata.append('items', items.join(','));
     await api.post(`points/${dados.point.id}`, fdata)
-      .then(function (res) {
+      .then(async function (res) {
         alert('Ponto de coleta alterado!');
         history.goBack();
       })

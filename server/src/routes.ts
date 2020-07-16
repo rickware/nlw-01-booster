@@ -32,7 +32,7 @@ routes.post('/points/:id',
   upload.single('image'), 
   celebrate({
     body: Joi.object().keys({
-      imageToDelete: Joi.string(),
+      imageOriginal: Joi.string(),
       name: Joi.string().required(),
       email: Joi.string().required().email(),
       whatsapp: Joi.string().required(),
@@ -42,7 +42,9 @@ routes.post('/points/:id',
       uf: Joi.string().required().max(2),
       items: Joi.string().required(),
     })
-  }, { abortEarly: false }), pointsController.update
+  },
+  { abortEarly: false }),
+  pointsController.update.bind(PointsController)
 );
 
 export default routes;

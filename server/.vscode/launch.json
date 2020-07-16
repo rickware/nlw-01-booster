@@ -10,10 +10,16 @@
       "name": "Launch Server",
       "request": "launch",
       "type": "node-terminal",
-
-      "serverReadyAction":{
-        "action": "openExternally"
-      }
-    },
+      "smartStep": true,
+      "sourceMaps": true,
+      "skipFiles": [ "<node_internals>/**" ],
+      "serverReadyAction":{ "action": "openExternally" },
+      "outFiles": [
+        "${workspaceFolder}/**/*.js",
+        "!**/node_modules/**"
+      ]
+    }
   ]
 }
+
+  
