@@ -12,7 +12,7 @@ const Routes = () => {
       <Route component={Home} path="/" exact />
       <Route component={CreatePoint} path="/create-point" />
       <Route component={ManagePoints} path="/manage-point" />
-      <Route component={ManageDetais} path="/webDetail" />
+      <Route component={ManageDetais} path="/webDetail/:id" />
     </BrowserRouter>
   );
 }

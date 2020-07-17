@@ -1,5 +1,5 @@
 import React, { useEffect, useState, ChangeEvent, FormEvent } from 'react';
-import { Link, useHistory } from 'react-router-dom';
+import { Link, useHistory, useParams } from 'react-router-dom';
 import { FiArrowLeft } from 'react-icons/fi';
 import { Map, TileLayer, Marker } from 'react-leaflet';
 import NumberFormat from 'react-number-format';
@@ -36,8 +36,8 @@ interface Dados {
 }
 
 const ManageDetail = () => {
-  var searchParams = new URLSearchParams();
-  let   id = searchParams.get('point_id');
+  let { id } = useParams();
+
   const [items, setItems] = useState<Item[]>([]);
   const [ufs, setUfs] = useState<string[]>([]);
   const [cities, setCities] = useState<string[]>([]);
@@ -54,6 +54,7 @@ const ManageDetail = () => {
 
   // useEffect(() => {qual funcao a executar}, [quando executar]) 
   useEffect(() => {   // Points
+    if (!id) { return;}
     api.get(`points/${id}`).then(response => { setDados(response.data); });
   }, [id]);
 

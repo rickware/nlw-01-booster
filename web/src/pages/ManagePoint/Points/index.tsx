@@ -1,6 +1,6 @@
-import React, { useEffect, useState, ChangeEvent, FormEvent } from 'react';
-import { Link, useHistory, /*Router, Route, Switch */} from 'react-router-dom';
-import { FiArrowLeft, FiArrowRightCircle } from 'react-icons/fi';
+import React, { useEffect, useState, ChangeEvent } from 'react';
+import { Link, useHistory } from 'react-router-dom';
+import { FiArrowLeft } from 'react-icons/fi';
 import { Map, TileLayer, Marker } from 'react-leaflet';
 import axios from 'axios';
 import { LeafletMouseEvent } from 'leaflet';
@@ -20,8 +20,8 @@ interface Point {
   latitude: number;
   longitude: number;
 }
-
-let getParams: Array<string> = ['uf', 'city'];
+interface Local { id: number; uf: string; city: string;}
+let getParams: Local = {id: 0, uf: '', city: ''};
 const mapAttrib = '&amp;copy <a href="http://osm.org/copyright">OpenStreetMap</a> contributors';
 const mapUrl = "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png";
 const IBGEApiUrl = 'https://servicodados.ibge.gov.br/api/v1/localidades/estados';
@@ -32,11 +32,10 @@ const ManagePoints = () => {
   const [ufs, setUfs] = useState<string[]>([]);
   const [cities, setCities] = useState<string[]>([]);
   const [initialPosition, setInitialPosition] = useState<[number, number]>([0, 0]);
-  //const [formData, setFormData] = useState({ name: '', email: '', whatsapp: '' });
   const [selectedUf, setSelectedUf] = useState('0');
   const [selectedCity, setSelectedCity] = useState('0');
   const [selectedItems, setSelectedItems] = useState<number[]>([]);
-  const [selectedPosition, setSelectedPosition] = useState<[number, number]>([0, 0]);
+  //const [selectedPosition, setSelectedPosition] = useState<[number, number]>([0, 0]);
   const history = useHistory();
 
   // useEffect(() => {qual funcao a executar}, [quando executar]) 
@@ -73,8 +72,8 @@ const ManagePoints = () => {
     if (selectedItems.length===0) { return; }
     api.get('points', {
       params: {
-        uf: getParams[0],       
-        city: getParams[1],      
+        uf: getParams.uf,
+        city: getParams.city,      
         items: selectedItems.join(',')
       }
     }).then(response => {
@@ -83,48 +82,34 @@ const ManagePoints = () => {
   }, [selectedItems]);
 
   function handleSelectUf(event: ChangeEvent<HTMLSelectElement>) {
-    const uf = event.target.value;
-    getParams[0] = uf;
-    setSelectedUf(uf);
+    const estado = event.target.value;
+    getParams.uf = estado;
+    setSelectedUf(estado);
   }
 
   function handleSelectCity(event: ChangeEvent<HTMLSelectElement>) {
     //  torna visivel os Items
     let shand = document.getElementsByName('fitems') as NodeListOf<HTMLElement>;
     if (shand.length !== 0) { shand[0].style.visibility = "visible" };
-    let sbutt = document.getElementById('btnSubmit') as HTMLElement;
-    sbutt.style.visibility = "visible";
-    const city = event.target.value;
-    getParams[1] = city;
-    setSelectedCity(city);
+    const cidade = event.target.value;
+    getParams.city = cidade;
+    setSelectedCity(cidade);
   }
+
   function handleMapClick(event: LeafletMouseEvent) {
-    setSelectedPosition([
+/*     setSelectedPosition([
       event.latlng.lat,
       event.latlng.lng,
-    ])
+    ]) */
   }
-  function handlePointClick(event: LeafletMouseEvent) {
-    /*
-    setSelectedPosition([
-      event.latlng.lat,
-      event.latlng.lng,
-    ])
-    */
+
+  function handleNavigateToDetail(id: number) {
+    let url = `/webDetail/${id}`;
+    history.push(url);
   }
-  /*
-    function handleNavigateToDetail(id: number) {
-      navigation.navigate('Detail', { point_id: id });
-    }
-  */
-  /*   function handleInputChange(event: ChangeEvent<HTMLInputElement>) {
-      const { name, value } = event.target;
-      setFormData({ ...formData, [name]: value });
-    } */
 
   function handleSelectItem(id: number) {
     const alreadySelected = selectedItems.findIndex(item => item === id);
-
     if (alreadySelected >= 0) {
       const filteredItems = selectedItems.filter(item => item !== id);
       setSelectedItems(filteredItems);
@@ -132,11 +117,10 @@ const ManagePoints = () => {
       setSelectedItems([...selectedItems, id]);
     }
   }
-
+/* 
   async function handleSubmit(event: FormEvent) {
     event.preventDefault();
 
-    //const { name, email, whatsapp } = formData;
     const uf = selectedUf;
     const city = selectedCity;
     const [latitude, longitude] = selectedPosition;
@@ -144,25 +128,25 @@ const ManagePoints = () => {
     const queryData = new FormData();
 
     var flagCampos = true; var queCampo = '';
-    //if (flagCampos && String(latitude).length < 3) { flagCampos = false; queCampo = 'Posicao'; }
     if (flagCampos && uf.length < 2) { flagCampos = false; queCampo = 'UF'; }
     if (flagCampos && city.length < 2) { flagCampos = false; queCampo = 'Cidade'; }
     if (flagCampos && items.length < 1) { flagCampos = false; queCampo = 'Items'; }
     if (flagCampos) {
-      //if (selectedFile) { data.append('image', selectedFile) }
       queryData.append('uf', uf);
       queryData.append('city', city);
       queryData.append('latitude', String(latitude));
       queryData.append('longitude', String(longitude));
       queryData.append('items', items.join(','));
-      /*
-      await api.post('points', data).catch(function (err) { alert(err.message); })
+
+      
+      //await api.post('points', queryData).catch(function (err) { alert(err.message); })
       alert('Ponto de coleta criado!');
-      */
+      
       history.push('/');
 
-    } else alert('Preencha o campo: ' + queCampo);
-  }
+    } else alert('Preencha o campo: ' + queCampo); 
+  
+  }*/
 
   return (
     <div id="page-manage-point">
@@ -175,7 +159,7 @@ const ManagePoints = () => {
         </Link>
       </header>
 
-      <form onSubmit={handleSubmit}>
+      <form>
         <h1>Pontos de coleta</h1>
 
         <fieldset>
@@ -213,11 +197,11 @@ const ManagePoints = () => {
                   lat: point.latitude,
                   lng: point.longitude
                 }}
-                onclick={handlePointClick}
+                onclick={() => handleNavigateToDetail(point.id)}
+                riseOnHover
               />
             ))}
           </Map>
-
         </fieldset>
 
         <fieldset name="fitems">
@@ -239,12 +223,6 @@ const ManagePoints = () => {
             ))}
           </ul>
         </fieldset>
-        <Link to="/webDetail">
-          <FiArrowRightCircle />
-          Ver Detalhe
-        </Link>
-
-        <button id="btnSubmit" type="submit">Ver ponto de coleta</button>
       </form>
     </div>
   );
