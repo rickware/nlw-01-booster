@@ -1,6 +1,8 @@
+// TODO Use cookies to store user preferences on start  https://github.com/tylerwolff/useCookie
+// TODO Cached queries seems better like https://github.com/tannerlinsley/react-query/blob/master/examples/basic/src/index.js
 import React, { useEffect, useState, ChangeEvent } from 'react';
 import { Link, useHistory } from 'react-router-dom';
-import { FiArrowLeft } from 'react-icons/fi';
+import { FiArrowLeft, FiActivity, FiArrowLeftCircle } from 'react-icons/fi';
 import { Map, TileLayer, Marker } from 'react-leaflet';
 import axios from 'axios';
 import { LeafletMouseEvent } from 'leaflet';
@@ -15,6 +17,9 @@ interface IBGECityResponse { nome: string; }
 interface Point {
   id: number;
   name: string;
+  uf: string;
+  city: string;
+  email: string;
   image: string;
   image_url: string;
   latitude: number;
@@ -35,10 +40,8 @@ const ManagePoints = () => {
   const [selectedUf, setSelectedUf] = useState('0');
   const [selectedCity, setSelectedCity] = useState('0');
   const [selectedItems, setSelectedItems] = useState<number[]>([]);
-  //const [selectedPosition, setSelectedPosition] = useState<[number, number]>([0, 0]);
   const history = useHistory();
 
-  // useEffect(() => {qual funcao a executar}, [quando executar]) 
   useEffect(() => {
     api.get('items').then(response => { setItems(response.data); });
   }, []);
@@ -64,32 +67,44 @@ const ManagePoints = () => {
       .then(response => {
         const cityNames = response.data.map(city => city.nome);
         setCities(cityNames);
-      });
+    }).catch(function (err) { alert(err.message); });
   }, [selectedUf]);
-
+    
   useEffect(() => {
-    //http://localhost:3333/points?city=Teres%C3%B3polis&uf=RJ&items=4
-    if (selectedItems.length===0) { return; }
+    if (selectedItems.length === 0) {
+      setPoints([]);
+      return;
+    }
     api.get('points', {
-      params: {
+    params: {
         uf: getParams.uf,
         city: getParams.city,      
         items: selectedItems.join(',')
       }
     }).then(response => {
       setPoints(response.data);
-    })
+    }).catch(function (err) { alert(err.message); })
   }, [selectedItems]);
 
+  function handleSelectItem(id: number) {
+    const alreadySelected = selectedItems.findIndex(item => item === id);
+    if (alreadySelected >= 0) {
+      const filteredItems = selectedItems.filter(item => item !== id);
+      setSelectedItems(filteredItems);
+    } else {
+      setSelectedItems([...selectedItems, id]);
+    }
+  }
+  
   function handleSelectUf(event: ChangeEvent<HTMLSelectElement>) {
     const estado = event.target.value;
     getParams.uf = estado;
     setSelectedUf(estado);
   }
-
+  
   function handleSelectCity(event: ChangeEvent<HTMLSelectElement>) {
     //  torna visivel os Items
-    let shand = document.getElementsByName('fitems') as NodeListOf<HTMLElement>;
+    let shand = document.getElementsByClassName('fitems') as HTMLSelectElement   //NodeListOf<HTMLElement>;
     if (shand.length !== 0) { shand[0].style.visibility = "visible" };
     const cidade = event.target.value;
     getParams.city = cidade;
@@ -104,49 +119,8 @@ const ManagePoints = () => {
   }
 
   function handleNavigateToDetail(id: number) {
-    let url = `/webDetail/${id}`;
-    history.push(url);
+    history.push(`/webDetail/${id}`);
   }
-
-  function handleSelectItem(id: number) {
-    const alreadySelected = selectedItems.findIndex(item => item === id);
-    if (alreadySelected >= 0) {
-      const filteredItems = selectedItems.filter(item => item !== id);
-      setSelectedItems(filteredItems);
-    } else {
-      setSelectedItems([...selectedItems, id]);
-    }
-  }
-/* 
-  async function handleSubmit(event: FormEvent) {
-    event.preventDefault();
-
-    const uf = selectedUf;
-    const city = selectedCity;
-    const [latitude, longitude] = selectedPosition;
-    const items = selectedItems;
-    const queryData = new FormData();
-
-    var flagCampos = true; var queCampo = '';
-    if (flagCampos && uf.length < 2) { flagCampos = false; queCampo = 'UF'; }
-    if (flagCampos && city.length < 2) { flagCampos = false; queCampo = 'Cidade'; }
-    if (flagCampos && items.length < 1) { flagCampos = false; queCampo = 'Items'; }
-    if (flagCampos) {
-      queryData.append('uf', uf);
-      queryData.append('city', city);
-      queryData.append('latitude', String(latitude));
-      queryData.append('longitude', String(longitude));
-      queryData.append('items', items.join(','));
-
-      
-      //await api.post('points', queryData).catch(function (err) { alert(err.message); })
-      alert('Ponto de coleta criado!');
-      
-      history.push('/');
-
-    } else alert('Preencha o campo: ' + queCampo); 
-  
-  }*/
 
   return (
     <div id="page-manage-point">
@@ -161,11 +135,10 @@ const ManagePoints = () => {
 
       <form>
         <h1>Pontos de coleta</h1>
-
         <fieldset>
           <legend>
             <h2>Endereço</h2>
-            <span>Selecione um endereço no mapa</span>
+            <span><FiArrowLeftCircle/> Selecione um endereço no mapa</span>
           </legend>
 
           <div className="field-group">
@@ -184,14 +157,17 @@ const ManagePoints = () => {
               </select>
             </div>
           </div>
-
+            </fieldset>
+			<div className="container">
+			<div>
           <Map center={initialPosition} zoom={15} onClick={handleMapClick}>
             <TileLayer
               attribution={mapAttrib}
               url={mapUrl}
-            />
-            {points.map(point => (
-              <Marker
+              />
+            {
+              points.map(point => (
+                <Marker
                 key={String(point.id)}
                 position={{
                   lat: point.latitude,
@@ -199,30 +175,30 @@ const ManagePoints = () => {
                 }}
                 onclick={() => handleNavigateToDetail(point.id)}
                 riseOnHover
-              />
-            ))}
+                />
+                ))}
           </Map>
-        </fieldset>
+			</div>
 
-        <fieldset name="fitems">
+        <div className="fitems">
           <legend>
             <h2>Ítens de coleta</h2>
             <span>Selecione um ou mais ítens abaixo</span>
           </legend>
-
           <ul className="items-grid">
             {items.map(item => (
               <li
-                key={item.id}
-                onClick={() => handleSelectItem(item.id)}
-                className={selectedItems.includes(item.id) ? 'selected' : ''}
+              key={item.id}
+              onClick={() => handleSelectItem(item.id)}
+              className={selectedItems.includes(item.id) ? 'selected' : ''}
               >
                 <img src={item.image_url} alt={item.title} />
                 <span>{item.title}</span>
               </li>
             ))}
           </ul>
-        </fieldset>
+          </div>
+          </div>
       </form>
     </div>
   );

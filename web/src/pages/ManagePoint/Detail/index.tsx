@@ -9,13 +9,11 @@ import api from '../../../services/api';
 import Dropzone from '../../../components/Dropzone';
 import logo from '../../../assets/logo.svg';
 import './styles.css';
-//import Routes from '../../../routes';
 
 // array ou objeto:  informar o tipo da variavel
 interface Item { id: number; title: string; image_url: string; }
 interface IBGEUFResponse { sigla: string; }
 interface IBGECityResponse { nome: string; }
-interface Params {point_id: number;}
 interface Dados {
   point: {
     id: number;
@@ -129,17 +127,16 @@ const ManageDetail = () => {
     const [latitude, longitude] = selectedPosition;
     const items = selectedItems;
     const fdata = new FormData();
-    
-    var flagCampos = true; var queCampo = '';
-    //if (flagCampos && !selectedFile) { flagCampos = false; queCampo = 'Imagem'; }
-    if (flagCampos && name.length < 3) { flagCampos = false; queCampo = 'Nome'; }
-    if (flagCampos && email.length < 3) { flagCampos = false; queCampo = 'Email'; }
-    if (flagCampos && whatsapp.length < 10) { flagCampos = false; queCampo = '(DDD)Whatsapp'; }
-    if (flagCampos && String(latitude).length < 3) { flagCampos = false; queCampo = 'Posicao'; }
-    if (flagCampos && uf.length < 2) { flagCampos = false; queCampo = 'UF'; }
-    if (flagCampos && city.length < 2) { flagCampos = false; queCampo = 'Cidade'; }
-    if (flagCampos && items.length < 1) { flagCampos = false; queCampo = 'Items'; }
-    if (!flagCampos) { alert('Preencha o campo: ' + queCampo); return (false); }
+    var camposForm = [];
+ 
+    if (name.length < 3)      { camposForm.push('Nome') };
+    if (email.length < 3)     { camposForm.push('Email') };
+    if (whatsapp.length < 10) { camposForm.push('(DDD)Whatsapp') };
+    if (String(latitude).length < 3) { camposForm.push('Posicao') };
+    if (uf.length < 2)        { camposForm.push('UF') };
+    if (city.length < 10)     { camposForm.push('Cidade') };
+    if (items.length < 1)     { camposForm.push('Items') };
+    if (camposForm.length > 0) { alert('Preencha o campo: ' + camposForm.join(' | ')); return (false); }
    
     if (selectedFile) {fdata.append('image', selectedFile);} 
     fdata.append('imageOriginal', dados.point.image);
@@ -266,9 +263,10 @@ const ManageDetail = () => {
           </ul>
         </fieldset>
         <button type="submit">Alterar ponto de coleta</button>
+        <button type="button" onClick={history.goBack}>Retornar</button>  
       </form>
     </div>
   );
 };
-
+// TODO Manter estado da pagina points anterior   history.goback?
 export default ManageDetail;

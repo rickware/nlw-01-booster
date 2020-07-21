@@ -2,13 +2,13 @@ import React, { useEffect, useState, ChangeEvent, FormEvent } from 'react';
 import { Link, useHistory } from 'react-router-dom';
 import { FiArrowLeft } from 'react-icons/fi';
 import { Map, TileLayer, Marker } from 'react-leaflet';
-import axios from 'axios';
 import { LeafletMouseEvent } from 'leaflet';
+import axios from 'axios';
 import api from '../../services/api';
 import Dropzone from '../../components/Dropzone';
+import NumberFormat from 'react-number-format';
 import './styles.css';
 import logo from '../../assets/logo.svg';
-import NumberFormat from 'react-number-format';
 
 // array ou objeto:  informar o tipo da variavel
 interface Item {id: number; title: string; image_url: string;}
