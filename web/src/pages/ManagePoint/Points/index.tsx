@@ -2,7 +2,7 @@
 // TODO Cached queries seems better like https://github.com/tannerlinsley/react-query/blob/master/examples/basic/src/index.js
 import React, { useEffect, useState, ChangeEvent } from 'react';
 import { Link, useHistory } from 'react-router-dom';
-import { FiArrowLeft, FiActivity, FiArrowLeftCircle } from 'react-icons/fi';
+import { FiArrowLeft, FiArrowLeftCircle } from 'react-icons/fi';
 import { Map, TileLayer, Marker } from 'react-leaflet';
 import axios from 'axios';
 import { LeafletMouseEvent } from 'leaflet';
@@ -138,10 +138,11 @@ const ManagePoints = () => {
         <fieldset>
           <legend>
             <h2>Endereço</h2>
-            <span><FiArrowLeftCircle/> Selecione um endereço no mapa</span>
+
           </legend>
 
           <div className="field-group">
+            <div className="ufCity">
             <div className="field">
               <label htmlFor="uf">Estado (UF)</label>
               <select name="uf" id="uf" value={selectedUf} onChange={handleSelectUf}>
@@ -155,7 +156,9 @@ const ManagePoints = () => {
                 <option value="0">Selecione uma cidade</option>
                 {cities.map(city => (<option key={city} value={city}>{city}</option>))}
               </select>
+              </div>
             </div>
+            <div className="msg2Client"><FiArrowLeftCircle /> Selecione um endereço no mapa</div>
           </div>
             </fieldset>
 			<div className="container">

@@ -8,7 +8,7 @@
 }
 
 #page-manage-point header {
-  margin-top: 10px;
+  margin: 20px 0;
   padding: 0 30px;
   display: flex;
   justify-content: space-between;
@@ -19,7 +19,6 @@
   color: var(--title-color);
   font-weight: bold;
   text-decoration: none;
-
   display: flex;
   align-items: center;
 }
@@ -71,7 +70,17 @@
 #page-manage-point form .field-group {
   /*flex: 1;*/
   display: flex;
-  justify-content: start;
+  justify-content: flex-start;
+}
+
+#page-manage-point form .ufCity {
+  width: 56%;
+  flex-direction: row;
+  display: flex;
+}
+
+#page-manage-point form .msg2Client {
+  font-size: larger;
 }
 
 #page-manage-point form .field {
@@ -190,21 +199,17 @@
   height: 180px;
   border-radius: 8px;
   padding: 32px 24px 16px;
-
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   align-items: center;
-
   text-align: center;
-
   cursor: pointer;
 }
 
 .items-grid li span {
   flex: 1;
   margin-top: 12px;
-
   display: flex;
   align-items: center;
   color: var(--title-color)
@@ -219,9 +224,11 @@
   #page-manage-point form .field-group {
     padding: 0px 12px;
   }
+
   #page-manage-point form .field-group {
     flex-direction: column;
   }
+
   #page-manage-point form .field-group .field + .field {
       margin-left: 0;
   }

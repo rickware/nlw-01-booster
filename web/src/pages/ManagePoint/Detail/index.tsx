@@ -32,6 +32,9 @@ interface Dados {
     title: string;
   }[];
 }
+const mapAttrib = '&amp;copy <a href="http://osm.org/copyright">OpenStreetMap</a> contributors';
+const mapUrl = "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png";
+const IBGEApiUrl = 'https://servicodados.ibge.gov.br/api/v1/localidades/estados';
 
 const ManageDetail = () => {
   let { id } = useParams();
@@ -39,7 +42,7 @@ const ManageDetail = () => {
   const [items, setItems] = useState<Item[]>([]);
   const [ufs, setUfs] = useState<string[]>([]);
   const [cities, setCities] = useState<string[]>([]);
-  const [initialPosition, setInitialPosition] = useState<[number, number]>([0, 0]);
+  //const [initialPosition, setInitialPosition] = useState<[number, number]>([0, 0]);
   const [formPerson, setFormPerson] = useState({ name: '', email: '', whatsapp: '' });
   const [selectedUf, setSelectedUf] = useState('0');
   const [selectedCity, setSelectedCity] = useState('0');
@@ -52,7 +55,7 @@ const ManageDetail = () => {
 
   // useEffect(() => {qual funcao a executar}, [quando executar]) 
   useEffect(() => {   // Points
-    if (!id) { return;}
+    if (!id) { return; }
     api.get(`points/${id}`).then(response => { setDados(response.data); });
   }, [id]);
 
@@ -60,15 +63,15 @@ const ManageDetail = () => {
     api.get('items').then(response => { setItems(response.data); });
   }, []);
 
-  useEffect(() => {   // GeoLocation
+/*   useEffect(() => {   // GeoLocation
     navigator.geolocation.getCurrentPosition(position => {
       const { latitude, longitude } = position.coords;
       setInitialPosition([latitude, longitude]);
     });
   }, []);
-
+ */
   useEffect(() => {   // UF
-    axios.get<IBGEUFResponse[]>('https://servicodados.ibge.gov.br/api/v1/localidades/estados').then(response => {
+    axios.get<IBGEUFResponse[]>(IBGEApiUrl).then(response => {
       const ufInitials = response.data.map(uf => uf.sigla).sort();
       setUfs(ufInitials);
     });
@@ -76,7 +79,8 @@ const ManageDetail = () => {
 
   useEffect(() => {   // City
     if (selectedUf === '0') { return; }
-    axios.get<IBGECityResponse[]>(`https://servicodados.ibge.gov.br/api/v1/localidades/estados/${selectedUf}/municipios`)
+    axios
+      .get<IBGECityResponse[]>(IBGEApiUrl.concat('/', selectedUf, '/municipios'))
       .then(response => {
         const cityNames = response.data.map(city => city.nome);
         setCities(cityNames);
@@ -114,11 +118,11 @@ const ManageDetail = () => {
       setSelectedItems([...selectedItems, id]);
     }
   }
-  
+
   function handleImgDblClick() {
     setNewfile(true);
   }
-  
+
   async function handleSubmit(event: FormEvent) {
     event.preventDefault();
     const { name, email, whatsapp } = formPerson;
@@ -128,17 +132,17 @@ const ManageDetail = () => {
     const items = selectedItems;
     const fdata = new FormData();
     var camposForm = [];
- 
-    if (name.length < 3)      { camposForm.push('Nome') };
-    if (email.length < 3)     { camposForm.push('Email') };
+
+    if (name.length < 3) { camposForm.push('Nome') };
+    if (email.length < 3) { camposForm.push('Email') };
     if (whatsapp.length < 10) { camposForm.push('(DDD)Whatsapp') };
     if (String(latitude).length < 3) { camposForm.push('Posicao') };
-    if (uf.length < 2)        { camposForm.push('UF') };
-    if (city.length < 10)     { camposForm.push('Cidade') };
-    if (items.length < 1)     { camposForm.push('Items') };
+    if (uf.length < 2) { camposForm.push('UF') };
+    if (city.length < 10) { camposForm.push('Cidade') };
+    if (items.length < 1) { camposForm.push('Items') };
     if (camposForm.length > 0) { alert('Preencha o campo: ' + camposForm.join(' | ')); return (false); }
-   
-    if (selectedFile) {fdata.append('image', selectedFile);} 
+
+    if (selectedFile) { fdata.append('image', selectedFile); }
     fdata.append('imageOriginal', dados.point.image);
     fdata.append('name', name);
     fdata.append('email', email);
@@ -156,19 +160,19 @@ const ManageDetail = () => {
       .catch(function (err) { alert(err.message) });
   }
 
-  if (!dados.point) { return null; }
+  if (!dados.point) { return null; }  // TODO Alerta erro point e history back 
   if (formPerson.name.length === 0) { setFormPerson({ name: dados.point.name, email: dados.point.email, whatsapp: dados.point.whatsapp }) }
   if (selectedPosition[0] === 0) { setSelectedPosition([dados.point.latitude, dados.point.longitude]) };
   if (selectedUf === '0') { setSelectedUf(dados.point.uf) };
   if (selectedCity === '0') { setSelectedCity(dados.point.city) };
-  
+
   if (selectedItems.length === 0) {
     var i: any;
     var dadositems: number[] = new Array(dados.items.length);
     for (i in dados.items) { dadositems[i] = dados.items[i].id; }
     setSelectedItems(dadositems);
   }
-  
+
   return (
     <div id="page-manage-detail">
       <header>
@@ -181,91 +185,95 @@ const ManageDetail = () => {
       </header>
 
       <form onSubmit={handleSubmit}>
-        <h1>Detalhes do <br /> ponto de coleta</h1>
+        <h1>Detalhes do ponto de coleta</h1>
+        <div className="firstFlex">
+          <div className="imageTools">
+            <div className={newfile ? 'setHidden' : 'setVisible'}>
+              <img className="imagem" src={dados.point.image_url} alt={dados.point.name} onDoubleClick={handleImgDblClick} title="De duplo-clique para alterar" />
+            </div>
+            <div className={newfile ? 'setVisible' : 'setHidden'}>
+              <Dropzone onFileUploaded={setSelectedFile} />
+            </div>
+          </div>
 
-        <div className={newfile ? 'setHidden' : 'setVisible'}>
-          <img className="imagem" src={dados.point.image_url} alt={dados.point.name} onDoubleClick={handleImgDblClick} title="De duplo-clique para alterar" />
+          <fieldset>
+            <legend> <h2>Dados</h2> </legend>
+            <div className="field">
+              <label htmlFor="name">Nome da entidade</label>
+              <input type="text" name="name" id="name" onChange={handleInputChange} defaultValue={dados.point.name} />
+            </div>
+            <div className="field-group">
+              <div className="field">
+                <label htmlFor="email">E-mail</label>
+                <input type="email" name="email" id="email" onChange={handleInputChange} defaultValue={dados.point.email} />
+              </div>
+              <div className="field">
+                <label htmlFor="whatsapp">Whatsapp</label>
+                <NumberFormat name="whatsapp" id="whatsapp" format="+55(##)#########" mask="_" onChange={handleInputChange} defaultValue={dados.point.whatsapp} />
+              </div>
+            </div>
+            <div className="field-group">
+              <div className="field">
+                <label htmlFor="uf">Estado (UF)</label>
+                <select name="uf" id="uf" value={selectedUf} onChange={handleSelectUf}>
+                  <option value="0">Selecione uma UF</option>
+                  {ufs.map(uf => (<option key={uf} value={uf}> {uf} </option>))}
+                </select>
+              </div>
+              <div className="field">
+                <label htmlFor="city">Cidade</label>
+                <select name="city" id="city" value={selectedCity} onChange={handleSelectCity}>
+                  <option value="0">Selecione uma cidade</option>
+                  {cities.map(city => (<option key={city} value={city}> {city} </option>))}
+                </select>
+              </div>
+            </div>
+          </fieldset>
         </div>
-
-        <div className={newfile ? 'setVisible' : 'setHidden'}>
-        <Dropzone onFileUploaded={setSelectedFile} />
+        <div className="secondFlex">
+          <div className="mapContainer">
+            <fieldset>
+              <legend>
+                <h2>Endereço</h2>
+                <span>Selecione o endereço no mapa</span>
+              </legend>
+              <div>
+                <Map center={selectedPosition} zoom={20} onClick={handleMapClick}>
+                  <TileLayer
+                    attribution={mapAttrib}
+                    url={mapUrl}
+                  />
+                  <Marker position={selectedPosition} />
+                </Map>
+              </div>
+            </fieldset>
+          </div>
+          <div className="itemsButtons">
+            <div className="itemsDeColeta">
+              <legend>
+                <h2>Ítens de coleta</h2>
+                <span>Selecione um ou mais ítens abaixo</span>
+              </legend>
+              <ul className="items-grid">
+                {items.map(item => (
+                  <li
+                    key={item.id}
+                    onClick={() => handleSelectItem(item.id)}
+                    className={selectedItems.includes(item.id) ? 'selected' : ''} >
+                    <img src={item.image_url} alt={item.title} />
+                    <span>{item.title}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div className="buttons">
+              <button type="submit">Alterar ponto de coleta</button>
+              <button type="button" onClick={history.goBack}>Retornar</button>
+            </div>
+          </div>
         </div>
-
-        <fieldset>
-          <legend> <h2>Dados</h2> </legend>
-
-          <div className="field">
-            <label htmlFor="name">Nome da entidade</label>
-            <input type="text" name="name" id="name" onChange={handleInputChange} defaultValue={dados.point.name} />
-          </div>
-
-          <div className="field-group">
-            <div className="field">
-              <label htmlFor="email">E-mail</label>
-              <input type="email" name="email" id="email" onChange={handleInputChange} defaultValue={dados.point.email} />
-            </div>
-            <div className="field">
-              <label htmlFor="whatsapp">Whatsapp</label>
-              <NumberFormat name="whatsapp" id="whatsapp" format="+55(##)#########" mask="_" onChange={handleInputChange} defaultValue={dados.point.whatsapp} />
-            </div>
-          </div>
-        </fieldset>
-
-        <fieldset>
-          <legend>
-            <h2>Endereço</h2>
-            <span>Selecione o endereço no mapa</span>
-          </legend>
-
-          <Map center={initialPosition} zoom={15} onClick={handleMapClick}>
-            <TileLayer
-              attribution='&amp;copy <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            />
-            <Marker position={selectedPosition} />
-          </Map>
-
-          <div className="field-group">
-            <div className="field">
-              <label htmlFor="uf">Estado (UF)</label>
-              <select name="uf" id="uf" value={selectedUf} onChange={handleSelectUf}>
-                <option value="0">Selecione uma UF</option>
-                {ufs.map(uf => ( <option key={uf} value={uf}> {uf} </option> ))}
-              </select>
-            </div>
-            <div className="field">
-              <label htmlFor="city">Cidade</label>
-              <select name="city" id="city" value={selectedCity} onChange={handleSelectCity}>
-                <option value="0">Selecione uma cidade</option>
-                {cities.map(city => ( <option key={city} value={city}> {city} </option> ))}
-              </select>
-            </div>
-          </div>
-        </fieldset>
-
-        <fieldset>
-          <legend>
-            <h2>Ítens de coleta</h2>
-            <span>Selecione um ou mais ítens abaixo</span>
-          </legend>
-
-          <ul className="items-grid">
-            {items.map(item => (
-              <li
-                key={item.id}
-                onClick={() => handleSelectItem(item.id)}
-                className={selectedItems.includes(item.id) ? 'selected' : ''}
-              >
-                <img src={item.image_url} alt={item.title} />
-                <span>{item.title}</span>
-              </li>
-            ))}
-          </ul>
-        </fieldset>
-        <button type="submit">Alterar ponto de coleta</button>
-        <button type="button" onClick={history.goBack}>Retornar</button>  
       </form>
-    </div>
+    </div >
   );
 };
 // TODO Manter estado da pagina points anterior   history.goback?
