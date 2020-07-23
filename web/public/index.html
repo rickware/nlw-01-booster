@@ -9,10 +9,35 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css" 	
       integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
 		  crossorigin=""
-		/>
+    />
+    <style>
+      #topHeader {
+        margin: 20px 10px;
+        padding: 0 30px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      #topHeader header a {
+        color: var(--title-color);
+        font-weight: bold;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+      }
+    </style>
 		<title>Ecoleta</title>
 	</head>
 	<body>
+    <div id=topHeader>
+      <img src="/static/media/logo.26434f1f.svg" alt="Ecoleta"><a href="/">
+        <svg stroke="currentColor" fill="none"
+        stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" height="1em" width="1em"
+        xmlns="http://www.w3.org/2000/svg">
+        <line x1="19" y1="12" x2="5" y2="12"></line>
+        <polyline points="12 19 5 12 12 5"></polyline>
+      </svg> Voltar para home</a>
+    </div>
 		<noscript>You need to enable JavaScript to run this app.</noscript>
 		<div id="root"></div>
 	</body>

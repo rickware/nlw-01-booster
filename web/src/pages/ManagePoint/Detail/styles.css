@@ -4,34 +4,12 @@
   margin: 0 auto;
 }
 
-#page-manage-detail header {
-  margin: 20px auto;
-  padding: 0 30px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-#page-manage-detail header a {
-  color: var(--title-color);
-  font-weight: bold;
-  text-decoration: none;
-  display: flex;
-  align-items: center;
-}
-
-#page-manage-detail header a svg {
-  margin-right: 16px;
-  color: var(--primary-color);
-}
-
 #page-manage-detail form {
   margin: 0px auto;
   padding: 15px 20px 1px 20px;
   max-width: 95%;
   background: #FFF;
   border-radius: 20px;
-
   display: flex;
   flex-direction: column;
 }
@@ -41,13 +19,16 @@
 }
 
 #page-manage-detail form .firstFlex {
-	display: flex;
+  display: flex;
   flex-direction: row;
   justify-content: space-around;
 }
 
+#page-manage-detail form .imageTools {
+  width: 50%;
+}
+
 #page-manage-detail form fieldset {
-  /* margin-top: 20px; */
   min-inline-size: auto;
   border: 0;
 }
@@ -71,16 +52,14 @@
 }
 
 #page-manage-detail form .field-group {
-  /* flex: 1; */
   display: flex;
   justify-content: space-between;
 }
 
 #page-manage-detail form .field {
-  /* flex: 1; */
   display: flex;
   flex-direction: column;
-  margin-bottom: 24px;
+  margin-bottom: 20px;
 }
 
 #page-manage-detail form .field input[type=text],
@@ -90,7 +69,7 @@
   background: #F0F0F5;
   border-radius: 8px;
   border: 0;
-  padding: 16px 24px;
+  padding: 10px 24px;
   font-size: 16px;
   color: #6C6C80;
 }
@@ -120,11 +99,11 @@
 #page-manage-detail form .field :disabled {
   cursor: not-allowed;
 }
-
+/*
 #page-manage-detail form .field-group .field + .field {
   margin-left: 24px;
 }
-
+*/
 #page-manage-detail form .field-group input + input {
   margin-left: 24px;
 }
@@ -154,19 +133,22 @@
 
 #page-manage-detail form .leaflet-container {
   width: 100%;
-  height: 428px;
+  height: 238px;
   border-radius: 20px;
-  /* margin-bottom: 24px; */
 }
 
-#page-manage-detail buttons {
+#page-manage-detail form .itemsButtons {
+  width: 45%;
+}
+  
+#page-manage-detail form .buttons {
   display: flex;
   flex-direction: row;
   justify-content: space-around;
 }
 
-  #page-manage-detail form button {
-  width: 260px;
+#page-manage-detail form button {
+  width: 160px;
   height: 56px;
   background: var(--primary-color);
   border-radius: 8px;
@@ -186,8 +168,8 @@
 
 .items-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+  gap: 5px;
   list-style: none;
 }
 
@@ -219,15 +201,10 @@
 }
 
 .imagem {
-  height: 300px;
+  height: 250px;
   background: #E1FAEC;
   border-radius: 10px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-top: 48px;
-  outline: 0;
-  object-fit: contain;
+  margin-top: 20px;
 }
 
 .setVisible {

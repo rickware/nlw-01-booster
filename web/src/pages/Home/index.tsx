@@ -1,17 +1,23 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { FiLogIn } from 'react-icons/fi';
 import { Link } from 'react-router-dom';
 import './styles.css';
-import logo from '../../assets/logo.svg';
+//import logo from '../../assets/logo.svg';
 
 const Home = () => {
+
+  useEffect(() => {
+    let topHeader = document.getElementById('topHeader') as HTMLElement;
+    topHeader.style.visibility = "hidden"
+  }, []);
+
   return (
     <div id="page-home">
       <div id="bg"></div>
       <div className="content">
-        <header>
+{/*     <header>
           <img src={logo} alt="Ecoleta" />
-        </header>
+        </header> */}
 
         <main>
           <h1>Seu marketplace de coleta de resíduos.</h1>

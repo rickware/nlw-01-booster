@@ -1,14 +1,14 @@
 // TODO Use cookies to store user preferences on start  https://github.com/tylerwolff/useCookie
 // TODO Cached queries seems better like https://github.com/tannerlinsley/react-query/blob/master/examples/basic/src/index.js
 import React, { useEffect, useState, ChangeEvent } from 'react';
-import { Link, useHistory } from 'react-router-dom';
-import { FiArrowLeft, FiArrowLeftCircle } from 'react-icons/fi';
+import { useHistory } from 'react-router-dom';
+import { FiArrowLeftCircle } from 'react-icons/fi';
 import { Map, TileLayer, Marker } from 'react-leaflet';
 import axios from 'axios';
 import { LeafletMouseEvent } from 'leaflet';
 import api from '../../../services/api';
 import './styles.css';
-import logo from '../../../assets/logo.svg';
+//import logo from '../../../assets/logo.svg';
 
 // array ou objeto:  informar o tipo da variavel
 interface Item { id: number; title: string; image_url: string; }
@@ -41,6 +41,11 @@ const ManagePoints = () => {
   const [selectedCity, setSelectedCity] = useState('0');
   const [selectedItems, setSelectedItems] = useState<number[]>([]);
   const history = useHistory();
+
+  useEffect(() => {
+    let topHeader = document.getElementById('topHeader') as HTMLElement;
+    topHeader.style.visibility = "visible"
+  }, []);
 
   useEffect(() => {
     api.get('items').then(response => { setItems(response.data); });
@@ -124,15 +129,6 @@ const ManagePoints = () => {
 
   return (
     <div id="page-manage-point">
-      <header>
-        <img src={logo} alt="Ecoleta" />
-
-        <Link to="/">
-          <FiArrowLeft />
-          Voltar para home
-        </Link>
-      </header>
-
       <form>
         <h1>Pontos de coleta</h1>
         <fieldset>

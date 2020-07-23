@@ -7,34 +7,12 @@
   margin: 0 auto;
 }
 
-#page-manage-point header {
-  margin: 20px 0;
-  padding: 0 30px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-#page-manage-point header a {
-  color: var(--title-color);
-  font-weight: bold;
-  text-decoration: none;
-  display: flex;
-  align-items: center;
-}
-
-#page-manage-point header a svg {
-  margin-right: 16px;
-  color: var(--primary-color);
-}
-
 #page-manage-point form {
   margin: 0px auto;
   padding: 15px 50px 1px 50px;
   max-width: 95%;
   background: #FFF;
   border-radius: 20px;
-
   display: flex;
   flex-direction: column;
 }
@@ -68,7 +46,6 @@
 }
 
 #page-manage-point form .field-group {
-  /*flex: 1;*/
   display: flex;
   justify-content: flex-start;
 }
@@ -84,7 +61,6 @@
 }
 
 #page-manage-point form .field {
-  /*flex: 1;*/
   display: flex;
   flex-direction: column;
   margin-bottom: 24px;
@@ -163,7 +139,6 @@
   width: 689px;
   height: 428px;
   border-radius: 20px;
-  /* margin: 20px; */
 }
 
 #page-manage-point form button {
