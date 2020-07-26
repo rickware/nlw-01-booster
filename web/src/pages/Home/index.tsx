@@ -8,7 +8,7 @@ const Home = () => {
 
   useEffect(() => {
     let topHeader = document.getElementById('topHeader') as HTMLElement;
-    topHeader.style.visibility = "hidden"
+    topHeader.style.visibility = "hidden";
   }, []);
 
   return (
