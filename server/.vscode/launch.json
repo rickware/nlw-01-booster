@@ -6,7 +6,7 @@
   "configurations": [
     {
       "cwd": "${workspaceFolder}",
-      "command": "npm run dev",
+      "command": "yarn debug",
       "name": "Launch Server",
       "request": "launch",
       "type": "node-terminal",
@@ -15,8 +15,7 @@
       "skipFiles": [ "<node_internals>/**" ],
       "serverReadyAction":{ "action": "openExternally" },
       "outFiles": [
-        "${workspaceFolder}/**/*.js",
-        "!**/node_modules/**"
+        "${workspaceFolder}/**/*.js", "!**/node_modules/**"
       ]
     }
   ]

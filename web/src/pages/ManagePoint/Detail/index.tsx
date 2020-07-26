@@ -1,15 +1,16 @@
 import React, { useEffect, useState, ChangeEvent, FormEvent } from 'react';
-import { useHistory, useParams } from 'react-router-dom';
-//import { FiArrowLeft } from 'react-icons/fi';
+import { Link, useHistory, useParams } from 'react-router-dom';
+import { FiArrowLeft } from 'react-icons/fi';
 import { Map, TileLayer, Marker } from 'react-leaflet';
 import NumberFormat from 'react-number-format';
 import axios from 'axios';
 import { LeafletMouseEvent } from 'leaflet';
 import api from '../../../services/api';
 import Dropzone from '../../../components/Dropzone';
-//import logo from '../../../assets/logo.svg';
+import logo from '../../../assets/logo.svg';
 import './styles.css';
 
+// array ou objeto:  informar o tipo da variavel
 interface Item { id: number; title: string; image_url: string; }
 interface IBGEUFResponse { sigla: string; }
 interface IBGECityResponse { nome: string; }
@@ -174,6 +175,15 @@ const ManageDetail = () => {
 
   return (
     <div id="page-manage-detail">
+      <header>
+        <img src={logo} alt="Ecoleta" />
+
+        <Link to="/">
+          <FiArrowLeft />
+          Voltar para home
+        </Link>
+      </header>
+
       <form onSubmit={handleSubmit}>
         <h1>Detalhes do ponto de coleta</h1>
         <div className="firstFlex">
@@ -220,7 +230,6 @@ const ManageDetail = () => {
             </div>
           </fieldset>
         </div>
-        
         <div className="secondFlex">
           <div className="mapContainer">
             <fieldset>
@@ -259,7 +268,6 @@ const ManageDetail = () => {
             </div>
             <div className="buttons">
               <button type="submit">Alterar ponto de coleta</button>
-              <button type="button">Excluir ponto de coleta</button>
               <button type="button" onClick={history.goBack}>Retornar</button>
             </div>
           </div>
