@@ -138,7 +138,6 @@ const ManagePoints = () => {
         <fieldset>
           <legend>
             <h2>Endereço</h2>
-
           </legend>
 
           <div className="field-group">

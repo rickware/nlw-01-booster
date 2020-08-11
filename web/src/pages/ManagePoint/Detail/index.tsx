@@ -188,10 +188,10 @@ const ManageDetail = () => {
         <h1>Detalhes do ponto de coleta</h1>
         <div className="firstFlex">
           <div className="imageTools">
-            <div className={newfile ? 'setHidden' : 'setVisible'}>
+            <div id="img_Atual"  className={newfile ? 'setHidden' : 'setVisible'}>
               <img className="imagem" src={dados.point.image_url} alt={dados.point.name} onDoubleClick={handleImgDblClick} title="De duplo-clique para alterar" />
             </div>
-            <div className={newfile ? 'setVisible' : 'setHidden'}>
+            <div id="img_Nova" className={newfile ? 'setVisible' : 'setHidden'}>
               <Dropzone onFileUploaded={setSelectedFile} />
             </div>
           </div>
