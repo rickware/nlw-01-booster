@@ -1,4 +1,6 @@
 node_modules/**/*
+/**/*.log
+/**/*.lock
 .expo/*
 npm-debug.*
 *.jks

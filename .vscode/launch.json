@@ -5,14 +5,19 @@
   "version": "0.2.0",
   "configurations": [
     {
+      "name": "Attach by Process ID",
+      "processId": "${command:PickProcess}",
+      "request": "attach",
       "skipFiles": [
         "<node_internals>/**"
       ],
-      "command": "npm start",
-      "name": "Run npm start",
+      "type": "pwa-node"
+    },
+    {
+      "command": "yarn start",
+      "name": "Run start",
       "request": "launch",
       "type": "node-terminal"
-    }
-
+    },
   ]
 }
